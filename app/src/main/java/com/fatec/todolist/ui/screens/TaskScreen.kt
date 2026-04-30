@@ -26,10 +26,10 @@ enum class TaskFilter(val label: String) {
 }
 
 @Composable
-fun TaskScreen (viewModel : TaskViewModel = viewModel()){
+fun TaskScreen(viewModel: TaskViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsState()
 
-    MaterialTheme{
+    MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier.fillMaxSize().statusBarsPadding().padding(16.dp),
@@ -40,62 +40,54 @@ fun TaskScreen (viewModel : TaskViewModel = viewModel()){
                 HorizontalDivider()
 
                 // Estatísticas
-                TaskStatsRow(state.totalTasks, state.doneTasks, state.pendingTasks)
+                TaskStatsRow(total = state.totalTasks, done = state.doneTasks, pending = state.pendingTasks)
 
                 // Filtros
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TaskFilter.entries.forEach { filter ->
                         FilterChip(
                             selected = state.currentFilter == filter,
-                            onClick = { viewModel.onFilterChange(filter)},
-                            label = {Text(filter.label)}
+                            onClick = { viewModel.onFilterChange(filter) },
+                            label = { Text(filter.label) }
                         )
                     }
                 }
 
                 // Campo + Botão
-                Row(Modifier.fillMaxSize(), Arrangement.spacedBy(8.dp), Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp), Alignment.CenterVertically) {
                     OutlinedTextField(
                         value = state.inputText,
-                        onValueChange = { viewModel.onInputChange(it)},
+                        onValueChange = { viewModel.onInputChange(it) },
                         modifier = Modifier.weight(1f),
-                        placeholder = { Text("Nova tarefa...")},
+                        placeholder = { Text("Nova tarefa...") },
                         singleLine = true,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    Button(onClick = {viewModel.addTask()}) {
+                    Button(onClick = { viewModel.addTask() }) {
                         Text("Adicionar")
                     }
                 }
 
                 // Lista
                 val filtered = state.filteredTasks
-
                 if (filtered.isEmpty()) {
                     Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
                         Text("Nenhuma tarefa", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
-                        items(items = filtered, key = {it.id}) { task ->
+                        items(items = filtered, key = { it.id }) { task ->
                             TaskItem(
                                 task = task,
-                                onToggle = { viewModel.toggleTask(task.id)},
-                                onDelete = { viewModel.removeTask(task.id)},
-                                modifier = Modifier.animateItem(
-                                    fadeInSpec = tween(300),
-                                    fadeOutSpec = tween(300)
-                                )
+                                onToggle = { viewModel.toggleTask(task.id) },
+                                onDelete = { viewModel.removeTask(task.id) },
+                                modifier = Modifier.animateItem(fadeInSpec = tween(300), fadeOutSpec = tween(300))
                             )
-
                         }
                     }
-
                 }
-
             }
         }
-
     }
 }
 
